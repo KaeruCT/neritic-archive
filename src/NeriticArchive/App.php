@@ -30,6 +30,7 @@ class App
             $rfn = new \ReflectionFunction($fn);
             $item = $rfn->invokeArgs(func_get_args());
             $app->lastModified(1349222558); // date of the last post ever
+            $app->expires('+5 years');
 
             if ($item === false) {
                $app->render(404, [

@@ -44,8 +44,12 @@ class App
                     'error' => true,
                     'msg' => 'No items found.'
                 ]);
+            } else {
+                $item = [$item]; // wrap only item in an array
             }
-            $app->render(200, ['content' => [$item]]);
+
+
+            $app->render(200, ['content' => $item]);
         });
     }
 
@@ -117,7 +121,8 @@ class App
             );
         });
 
-        $this->get('/users', function () use ($db, $app) {
+        $this->get('/users', function () use ($db, $app)
+        {
             return $db->fetchCollection(
                 new UserTransformer,
                 'SELECT * FROM users ORDER BY id'

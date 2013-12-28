@@ -1,5 +1,6 @@
 <?php namespace NeriticArchive;
 
+use \NeriticArchive\Transformer\CategoryTransformer;
 use \NeriticArchive\Transformer\ForumTransformer;
 use \NeriticArchive\Transformer\UserTransformer;
 use \NeriticArchive\Transformer\ThreadTransformer;
@@ -25,13 +26,21 @@ class App
     private function get($route, \Closure $fn)
     {
         $app = $this->app;
-        $app->get($route, function ($id) use ($app, $fn) {
-            $item = $fn($id);
+        $app->get($route, function () use ($app, $fn) {
+            $rfn = new \ReflectionFunction($fn);
+            $item = $rfn->invokeArgs(func_get_args());
+
             if ($item === false) {
-               $app->render(404, ['error' => 'Item not found.']);
+               $app->render(404, [
+                    'error' => true,
+                    'msg' => 'Item not found.'
+                ]);
             }
             if (is_array($item) && count($item) === 0) {
-                $app->render(404, ['error' => 'No items found.']);
+                $app->render(404, [
+                    'error' => true,
+                    'msg' => 'No items found.'
+                ]);
             }
             $app->render(200, ['content' => [$item]]);
         });
@@ -41,10 +50,28 @@ class App
     {
         $app = $this->app;
         $db = $this->db;
-        $this->get('/forums', function () use ($db, $app) {
+
+        $this->get('/categories', function () use ($db, $app)
+        {
+            return $db->fetchCollection(
+                new CategoryTransformer,
+                'SELECT * FROM categories ORDER BY ord ASC'
+            );
+        });
+
+        $this->get('/categories/:id', function ($id) use ($db, $app)
+        {
+            return $db->fetchItem(
+                new CategoryTransformer,
+                'SELECT * FROM categories WHERE id = ?', [$id]
+            );
+        });
+
+        $this->get('/categories/:id/forums', function ($id) use ($db, $app)
+        {
             return $db->fetchCollection(
                 new ForumTransformer,
-                'SELECT * FROM forums'
+                'SELECT * FROM forums WHERE cat = ? ORDER BY ord ASC', [$id]
             );
         });
 
@@ -60,7 +87,7 @@ class App
         {
             return $db->fetchCollection(
                 new ThreadTransformer,
-                'SELECT * FROM threads WHERE forum = ?', [$id]
+                'SELECT * FROM threads WHERE forum = ? ORDER BY sticky DESC, lastdate DESC', [$id]
             );
         });
 
@@ -76,7 +103,7 @@ class App
         {
             return $db->fetchCollection(
                 new PostTransformer,
-                ' SELECT p.*, pt.date as ptdate, pt.text text '
+                 'SELECT p.*, pt.date as ptdate, pt.text text '
                 .'FROM `posts` p '
                 .'LEFT JOIN `poststext` pt ON p.`id` = pt.`id` '
                 .'LEFT JOIN `poststext` pt2 ON pt2.`id` = pt.`id` AND pt2.`revision` = (pt.`revision`+1) '
@@ -90,7 +117,7 @@ class App
         $this->get('/users', function () use ($db, $app) {
             return $db->fetchCollection(
                 new UserTransformer,
-                'SELECT * FROM users'
+                'SELECT * FROM users ORDER BY id'
             );
         });
 

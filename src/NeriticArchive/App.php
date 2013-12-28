@@ -118,6 +118,21 @@ class App
             );
         });
 
+        $this->get('/posts/:id', function ($id) use ($db, $app)
+        {
+            return $db->fetchItem(
+                new PostTransformer,
+                 'SELECT p.*, pt.date as ptdate, pt.text text '
+                .'FROM `posts` p '
+                .'LEFT JOIN `poststext` pt ON p.`id` = pt.`id` '
+                .'LEFT JOIN `poststext` pt2 ON pt2.`id` = pt.`id` AND pt2.`revision` = (pt.`revision`+1) '
+                .'WHERE p.`id` = ? AND ISNULL(pt2.`id`) '
+                .'GROUP BY p.`id` '
+                .'ORDER BY p.`id` ',
+                [$id]
+            );
+        });
+
         $this->get('/users', function () use ($db, $app)
         {
             return $db->fetchCollection(

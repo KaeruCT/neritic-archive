@@ -39,11 +39,13 @@ class App
                     'msg' => 'Item not found.'
                 ]);
             }
-            if (is_array($item) && count($item) === 0) {
-                $app->render(404, [
-                    'error' => true,
-                    'msg' => 'No items found.'
-                ]);
+            if (is_array($item)) {
+                if (count($item) === 0) {
+                    $app->render(404, [
+                        'error' => true,
+                        'msg' => 'No items found.'
+                    ]);
+                }
             } else {
                 $item = [$item]; // wrap only item in an array
             }

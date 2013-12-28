@@ -1,8 +1,0 @@
-<?php
-
-return [
-    'db_host' => 'localhost',
-    'db_name' => 'neritic',
-    'db_user' => 'user',
-    'db_pass' => 'pass',
-];

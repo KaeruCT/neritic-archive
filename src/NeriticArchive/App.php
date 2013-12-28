@@ -6,6 +6,7 @@ use \NeriticArchive\Transformer\UserTransformer;
 use \NeriticArchive\Transformer\ThreadTransformer;
 use \NeriticArchive\Transformer\PostTransformer;
 use \NeriticArchive\Db;
+use \NeriticArchive\View;
 
 class App
 {
@@ -17,7 +18,7 @@ class App
 
         $app = new \Slim\Slim();
         $this->app = $app;
-        $app->view(new \JsonApiView());
+        $app->view(new View());
         $app->add(new \JsonApiMiddleware());
         $app->config('debug', false);
         $this->initViews();

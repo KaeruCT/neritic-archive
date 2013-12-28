@@ -39,17 +39,12 @@ class App
                     'msg' => 'Item not found.'
                 ]);
             }
-            if (is_array($item)) {
-                if (count($item) === 0) {
-                    $app->render(404, [
-                        'error' => true,
-                        'msg' => 'No items found.'
-                    ]);
-                }
-            } else {
-                $item = [$item]; // wrap only item in an array
+            if (is_array($item) && (count($item) === 0)) {
+                $app->render(404, [
+                    'error' => true,
+                    'msg' => 'No items found.'
+                ]);
             }
-
 
             $app->render(200, ['content' => $item]);
         });

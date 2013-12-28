@@ -29,6 +29,7 @@ class App
         $app->get($route, function () use ($app, $fn) {
             $rfn = new \ReflectionFunction($fn);
             $item = $rfn->invokeArgs(func_get_args());
+            $app->lastModified(1349222558); // date of the last post ever
 
             if ($item === false) {
                $app->render(404, [

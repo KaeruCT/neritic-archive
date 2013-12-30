@@ -49,7 +49,8 @@ class App
 
             $response = [];
 
-            if (isset($result['_collection'])) { // collection of items
+            if (isset($result['_collection']) && isset($result['_collection']['pagination'])) {
+                // paginated collection of items
                 $response += [
                     'content' => $result['_collection'],
                     'pagination' => $result['pagination']

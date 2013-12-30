@@ -8,8 +8,8 @@ class PostTransformer extends TransformerAbstract
             'id' => (int)$r['id'],
             'user' => (int)$r['user'],
             'thread' => $r['thread'],
-            'date' => (bool)$r['date'],
-            'modifiedDate' => (bool)$r['ptdate'],
+            'date' => $this->formatDate($r['date']),
+            'modifiedDate' => $this->formatDate($r['ptdate']),
             'content' => $r['text'],
         ];
     }

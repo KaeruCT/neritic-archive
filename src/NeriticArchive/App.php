@@ -30,24 +30,37 @@ class App
         $app = $this->app;
         $app->get($route, function () use ($app, $fn) {
             $rfn = new \ReflectionFunction($fn);
-            $item = $rfn->invokeArgs(func_get_args());
+            $result = $rfn->invokeArgs(func_get_args());
             $app->lastModified(1349222558); // date of the last post ever
             $app->expires('+5 years');
 
-            if ($item === false) {
+            if ($result === false) {
                $app->render(404, [
                     'error' => true,
                     'msg' => 'Item not found.'
                 ]);
             }
-            if (is_array($item) && (count($item) === 0)) {
+            if (is_array($result) && count($result) === 0) {
                 $app->render(404, [
                     'error' => true,
                     'msg' => 'No items found.'
                 ]);
             }
 
-            $app->render(200, ['content' => $item]);
+            $response = [];
+
+            if (isset($result['_collection'])) { // collection of items
+                $response += [
+                    'content' => $result['_collection'],
+                    'pagination' => $result['pagination']
+                ];
+            } else { // lone items
+                $response += [
+                    'content' => $result
+                ];
+            }
+
+            $app->render(200, $response);
         });
     }
 

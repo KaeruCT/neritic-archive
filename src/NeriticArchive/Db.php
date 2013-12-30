@@ -35,15 +35,30 @@ class Db
     {
         if (!is_array($params)) {
             $page = $params;
+            $params = [];
         }
 
         if ($page !== null) {
             $offset = $page * $this->itemsPerPage;
+            $query = preg_replace('/SELECT/', 'SELECT SQL_CALC_FOUND_ROWS', $query, 1);
             $query .= " LIMIT {$offset}, {$this->itemsPerPage}";
         }
 
         $stmt = $this->query($query, $params);
-        return $this->fetchCollectionStmt($t, $stmt);
+        $return = ['_collection' => $this->fetchCollectionStmt($t, $stmt)];
+
+        if ($page !== null) {
+            $totalCount = (int)$this->pdo->query('SELECT FOUND_ROWS()')->fetchColumn();
+
+            $return['pagination'] = [
+                'page' => $page,
+                'perPage' => $this->itemsPerPage,
+                'pageCount' => 1 + floor($totalCount/$this->itemsPerPage),
+                'totalCount' => $totalCount
+            ];
+        }
+
+        return $return;
     }
 
     private function query($query, array $params=[])

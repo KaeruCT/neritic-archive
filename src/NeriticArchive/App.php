@@ -49,16 +49,15 @@ class App
 
             $response = [];
 
-            if (isset($result['_collection']) && isset($result['_collection']['pagination'])) {
-                // paginated collection of items
-                $response += [
-                    'content' => $result['_collection'],
-                    'pagination' => $result['pagination']
-                ];
-            } else { // lone items
-                $response += [
-                    'content' => $result
-                ];
+            if (isset($result['_collection'])) {
+                $response['content'] = $result['_collection'];
+                if (isset($result['_pagination'])) {
+                    // include pagination metadata
+                    $response['pagination'] = $result['_pagination'];
+                }
+            } else {
+                // lone items
+                $response['content'] = $result;
             }
 
             $app->render(200, $response);

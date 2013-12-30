@@ -50,7 +50,7 @@ class Db
         if ($page !== null) {
             $totalCount = (int)$this->pdo->query('SELECT FOUND_ROWS()')->fetchColumn();
 
-            $return['pagination'] = [
+            $return['_pagination'] = [
                 'page' => $page,
                 'perPage' => $this->itemsPerPage,
                 'pageCount' => 1 + floor($totalCount/$this->itemsPerPage),

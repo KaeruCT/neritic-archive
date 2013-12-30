@@ -11,6 +11,9 @@ abstract class TransformerAbstract
 
     public function formatDate($timestamp)
     {
+        if (!$timestamp) {
+            return null;
+        }
         return date('c', $timestamp);
     }
 }

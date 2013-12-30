@@ -55,10 +55,14 @@ class App
     {
         $app = $this->app;
         $db = $this->db;
+        $page = $app->request()->params('page');
+        if ($page === null) {
+            $page = 0;
+        }
 
         \Slim\Route::setDefaultConditions(['id' => '\d+']);
 
-        $this->get('/categories', function () use ($db, $app)
+        $this->get('/categories', function () use ($db)
         {
             return $db->fetchCollection(
                 new CategoryTransformer,
@@ -66,7 +70,7 @@ class App
             );
         });
 
-        $this->get('/categories/:id', function ($id) use ($db, $app)
+        $this->get('/categories/:id', function ($id) use ($db)
         {
             return $db->fetchItem(
                 new CategoryTransformer,
@@ -74,7 +78,7 @@ class App
             );
         });
 
-        $this->get('/categories/:id/forums', function ($id) use ($db, $app)
+        $this->get('/categories/:id/forums', function ($id) use ($db)
         {
             return $db->fetchCollection(
                 new ForumTransformer,
@@ -82,7 +86,7 @@ class App
             );
         });
 
-        $this->get('/forums/:id', function ($id) use ($db, $app)
+        $this->get('/forums/:id', function ($id) use ($db)
         {
             return $db->fetchItem(
                 new ForumTransformer,
@@ -90,15 +94,15 @@ class App
             );
         });
 
-        $this->get('/forums/:id/threads', function ($id) use ($db, $app)
+        $this->get('/forums/:id/threads', function ($id) use ($db, $page)
         {
             return $db->fetchCollection(
                 new ThreadTransformer,
-                'SELECT * FROM threads WHERE forum = ? ORDER BY sticky DESC, lastdate DESC', [$id]
+                'SELECT * FROM threads WHERE forum = ? ORDER BY sticky DESC, lastdate DESC', [$id], $page
             );
         });
 
-        $this->get('/threads/:id', function ($id) use ($db, $app)
+        $this->get('/threads/:id', function ($id) use ($db)
         {
             return $db->fetchItem(
                 new ThreadTransformer,
@@ -106,7 +110,7 @@ class App
             );
         });
 
-        $this->get('/threads/:id/posts', function ($id) use ($db, $app)
+        $this->get('/threads/:id/posts', function ($id) use ($db, $page)
         {
             return $db->fetchCollection(
                 new PostTransformer,
@@ -117,11 +121,12 @@ class App
                 .'WHERE p.`thread` = ? AND ISNULL(pt2.`id`) '
                 .'GROUP BY p.`id` '
                 .'ORDER BY p.`id` ',
-                [$id]
+                [$id],
+                $page
             );
         });
 
-        $this->get('/posts/:id', function ($id) use ($db, $app)
+        $this->get('/posts/:id', function ($id) use ($db)
         {
             return $db->fetchItem(
                 new PostTransformer,
@@ -136,15 +141,16 @@ class App
             );
         });
 
-        $this->get('/users', function () use ($db, $app)
+        $this->get('/users', function () use ($db, $page)
         {
             return $db->fetchCollection(
                 new UserTransformer,
-                'SELECT * FROM users ORDER BY id'
+                'SELECT * FROM users ORDER BY id',
+                $page
             );
         });
 
-        $this->get('/users/:id', function ($id) use ($db, $app)
+        $this->get('/users/:id', function ($id) use ($db)
         {
             return $db->fetchItem(
                 new UserTransformer,
@@ -152,15 +158,15 @@ class App
             );
         });
 
-        $this->get('/users/:id/comments', function ($id) use ($db, $app)
+        $this->get('/users/:id/comments', function ($id) use ($db, $page)
         {
             return $db->fetchCollection(
                 new CommentTransformer,
-                'SELECT * FROM ucom WHERE userto = ?', [$id]
+                'SELECT * FROM ucom WHERE userto = ?', [$id], $page
             );
         });
 
-        $this->get('/comments/:id', function ($id) use ($db, $app)
+        $this->get('/comments/:id', function ($id) use ($db)
         {
             return $db->fetchItem(
                 new CommentTransformer,

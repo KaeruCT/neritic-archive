@@ -6,6 +6,7 @@ use \PDO;
 class Db
 {
     private $pdo;
+    private $itemsPerPage;
 
     public function __construct(array $config)
     {
@@ -14,6 +15,10 @@ class Db
             $config['db_user'],
             $config['db_pass']
         );
+        $this->itemsPerPage = (int)$config['items_per_page'];
+        if (!$this->itemsPerPage) {
+            $this->itemsPerPage = 20; // default;
+        }
     }
 
     public function fetchItem(TransformerAbstract $t, $query, array $params=[])
@@ -22,8 +27,21 @@ class Db
         return $this->fetchItemStmt($t, $stmt);
     }
 
-    public function fetchCollection(TransformerAbstract $t, $query, array $params=[])
+    public function fetchCollection(
+        TransformerAbstract $t,
+        $query,
+        $params=[],
+        $page=null)
     {
+        if (!is_array($params)) {
+            $page = $params;
+        }
+
+        if ($page !== null) {
+            $offset = $page * $this->itemsPerPage;
+            $query .= " LIMIT {$offset}, {$this->itemsPerPage}";
+        }
+
         $stmt = $this->query($query, $params);
         return $this->fetchCollectionStmt($t, $stmt);
     }

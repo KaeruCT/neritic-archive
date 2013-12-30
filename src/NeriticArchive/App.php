@@ -5,6 +5,7 @@ use \NeriticArchive\Transformer\ForumTransformer;
 use \NeriticArchive\Transformer\UserTransformer;
 use \NeriticArchive\Transformer\ThreadTransformer;
 use \NeriticArchive\Transformer\PostTransformer;
+use \NeriticArchive\Transformer\CommentTransformer;
 use \NeriticArchive\Db;
 use \NeriticArchive\View;
 
@@ -54,6 +55,8 @@ class App
     {
         $app = $this->app;
         $db = $this->db;
+
+        \Slim\Route::setDefaultConditions(['id' => '\d+']);
 
         $this->get('/categories', function () use ($db, $app)
         {
@@ -146,6 +149,22 @@ class App
             return $db->fetchItem(
                 new UserTransformer,
                 'SELECT * FROM users WHERE id = ?', [$id]
+            );
+        });
+
+        $this->get('/users/:id/comments', function ($id) use ($db, $app)
+        {
+            return $db->fetchCollection(
+                new CommentTransformer,
+                'SELECT * FROM ucom WHERE userto = ?', [$id]
+            );
+        });
+
+        $this->get('/comments/:id', function ($id) use ($db, $app)
+        {
+            return $db->fetchItem(
+                new CommentTransformer,
+                'SELECT * FROM ucom WHERE id = ?', [$id]
             );
         });
     }

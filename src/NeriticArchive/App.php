@@ -22,7 +22,7 @@ class App
         $app->view(new View());
         $app->add(new \JsonApiMiddleware());
         $app->config('debug', false);
-        $this->initViews();
+        $this->initRoutes();
     }
 
     private function get($route, \Closure $fn)
@@ -51,7 +51,7 @@ class App
         });
     }
 
-    private function initViews()
+    private function initRoutes()
     {
         $app = $this->app;
         $db = $this->db;

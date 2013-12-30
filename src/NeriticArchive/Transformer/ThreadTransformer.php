@@ -6,6 +6,7 @@ class ThreadTransformer extends TransformerAbstract
     {
         return [
             'id' => (int)$r['id'],
+            'forum' => (int)$r['forum'],
             'title' => $r['title'],
             'user' => (int)$r['user'],
             'closed' => (bool)$r['closed'],

@@ -6,6 +6,7 @@ class ForumTransformer extends TransformerAbstract
     {
         return [
             'id' => (int)$r['id'],
+            'category' => (int)$r['cat'],
             'title' => $r['title'],
             'description' => $r['descr'],
             'threadCount' => (int)$r['threads'],

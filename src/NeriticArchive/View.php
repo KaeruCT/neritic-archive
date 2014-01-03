@@ -49,7 +49,7 @@ class View extends \Slim\View {
                 return iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($val));
             };
 
-            $jsonResponse = array_map($fixEncoding, $response);
+            $jsonResponse = json_encode(array_map($fixEncoding, $response));
         }
 
         $app->response()->status($status);

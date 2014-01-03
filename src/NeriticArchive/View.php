@@ -39,6 +39,15 @@ class View extends \Slim\View {
         $response['status'] = $status;
         unset($response['flash']);
 
+        $fixEncoding = function ($val) use (&$fixEncoding) {
+            if (is_array($val)) {
+                return array_map($fixEncoding, $val);
+            }
+            return iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($val));
+        };
+
+        $response = array_map($fixEncoding, $response);
+
         $app->response()->status($status);
         $app->response()->header('Content-Type', 'application/json');
         $app->response()->body($this->jsonpWrap(json_encode($response)));

@@ -54,7 +54,7 @@ class View extends \Slim\View {
 
         $app->response()->status($status);
         $app->response()->header('Content-Type', 'application/json');
-        $app->response()->body($this->jsonpWrap($response));
+        $app->response()->body($this->jsonpWrap($jsonResponse));
 
         $app->stop();
     }
